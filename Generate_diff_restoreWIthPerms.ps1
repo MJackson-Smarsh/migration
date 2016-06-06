@@ -1,7 +1,7 @@
 ﻿<# Will read in a file of databases and take that and generate a restore script then sftp it over to vegas.
 script it generates will restore fulls but without recovery, so they will be awaiting the diff.  Please note, there is NO
 automatino as to where the files will go on the new prod instance, you will still need to comment / un-comment the sql below in strsql variable
-
+#this is a test.
 
 #>
 

@@ -537,10 +537,12 @@ try
 #$cred = new-object -typename system.management.automation.PSCredential -argumentList $(whoami), ($passworrd | convertTo-SecureString)
 #get-credential -credential $(whoami)
     
-    $password = read-host "enter amer netowrk password"
-    $username = 'ward_' + $env:USERNAme
+    $username = 'ward_' + $env:USERNAME
     $username = $username -replace " ",""
-    $username
+    $SecurePassword = read-host -prompt "Enter your USCUST Password please" -AsSecureString
+    $BSTR = `
+        [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecurePassword)
+        $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR) 
 
     # Load WinSCP .NET assembly
     # Use "winscp.dll" for the releases before the latest beta version.
@@ -551,7 +553,7 @@ try
     $sessionOptions.Protocol = [WinSCP.Protocol]::sftp
     $sessionOptions.HostName = "10.11.180.11"
     $sessionOptions.UserName = $username
-    $sessionOptions.Password =  $password
+    $sessionOptions.Password =  $Plainpassword
     $SessionOptions.GiveUpSecurityAndAcceptAnySshHostKey
     $sessionOptions.SshHostKeyFingerprint = "ssh-rsa 1024 20:dd:23:50:8d:69:23:9c:bd:2a:c3:18:91:fb:42:80"  #sftp to host and get this
     $session = New-Object WinSCP.Session
@@ -566,29 +568,13 @@ try
         $remotePath = "/SQL Dba Team/ECA_MIG/"
         $filestomove = $localfile -split ' '
         
-
         foreach ($line in $filestomove)
         {
             write-host ("Uploading {0}..." -f $line)
             $session.PutFiles($line, $remotepath).check()
 
         }
-<#
-        # Upload files
-        $transferOptions = New-Object WinSCP.TransferOptions
-        $transferOptions.TransferMode = [WinSCP.TransferMode]::Binary
- 
-        $transferResult = $session.PutFiles($localfile, $remoteFile, $False, $transferOptions)
- 
-        # Throw on any error
-        $transferResult.Check()
- 
-        # Print results
-        foreach ($transfer in $transferResult.Transfers)
-        {
-            Write-Host ("Upload of {0} succeeded" -f $transfer.FileName)
-        }
-       #>
+
     }
     finally
     {
@@ -748,7 +734,7 @@ TRY
  $DestinationInstance = SelectDestination
  write-host $DestinationInstance  " that is the location to restore to"
  $destinationArr =$DestinationInstance -split ' '
- #$dstinstance = $destinationArr[0]
+ $dstinstance = $destinationArr[0]
  $datafilelocation = $destinationArr[1]
  write-host "here is destination instance" $dstinstance " and the path " $datafilelocation
 
@@ -767,7 +753,7 @@ TRY
         "P016sqlc0102\sql02" {$logdir = 'F:\SQL02_Logs_MP01\MSSQL\Logs\'}   ##Instance log location 
     }
  if(test-path filesystem::$filetouse) {
-        write-host "File exists"
+        write-host "File of databases to work on exists, will proceed"
         copy-item -Path $filetouse -Destination  filesystem::$serverpath  #copy it to the server so bulk works.
         $basefile =  [io.path]::getfilenamewithoutextension($filetouse)  #get just the filename.
         $basedir = [io.path]::GetDirectoryName($filetouse)   #get base dir user specified

@@ -8,11 +8,10 @@ automatino as to where the files will go on the new prod instance, you will stil
 function run_sql {
 
 
- [CmdletBinding()]
-    Param(
+ [CmdletBinding()] 
     [Parameter(Mandatory=$true)] [string]$bulkfile,
     [Parameter(Mandatory=$true)] [string]$logdir
-        )
+        
 $strsql="
 use msdb
 declare @DatabaseList table (DatabaseName varchar(100))
